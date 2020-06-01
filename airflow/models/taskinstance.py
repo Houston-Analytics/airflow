@@ -262,7 +262,6 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
         self.dag_id = task.dag_id
         self.task_id = task.task_id
         self.task = task
-        self.tags = task.tags
         self.refresh_from_task(task)
         self._log = logging.getLogger("airflow.task")
 
@@ -589,7 +588,7 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
             tags = tag_qry.all()
 
         if tags:
-            self.tags = [tag.name for tag in tags]
+            self.tags = tags
 
         self.log.debug("Refreshed TaskInstance %s", self)
 
