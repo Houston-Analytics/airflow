@@ -33,7 +33,7 @@ import jinja2
 import lazy_object_proxy
 import pendulum
 from jinja2 import TemplateAssertionError, UndefinedError
-from sqlalchemy import Column, Float, Index, Integer, PickleType, String, and_, func, or_
+from sqlalchemy import Column, Float, Index, Integer, PickleType, String, ForeignKey, and_, func, or_
 from sqlalchemy.orm import reconstructor
 from sqlalchemy.orm.session import Session
 from sqlalchemy.sql.elements import BooleanClauseList
@@ -1941,3 +1941,12 @@ if STATICA_HACK:  # pragma: no cover
     from airflow.models.dagrun import DagRun
     TaskInstance.dag_run = relationship(DagRun)
     TaskInstance.queued_by_job = relationship(BaseJob)
+
+class TaskTag(Base):
+    """
+    Model for task tags, connected to task instances by dag_id and task_id
+    """
+    __tablename__ = 'task_tag'
+    name = Column('name', String(length=100), primary_key=True)
+    dag_id = Column('dag_id', String(length=ID_LEN), ForeignKey('task_instance.dag_id'), primary_key=True)
+    task_id = Column('task_id', String(length=ID_LEN), ForeignKey('task_instance.task_id'), primary_key=True)
