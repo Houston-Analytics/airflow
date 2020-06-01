@@ -262,6 +262,7 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
         self.dag_id = task.dag_id
         self.task_id = task.task_id
         self.task = task
+        self.tags = task.tags
         self.refresh_from_task(task)
         self._log = logging.getLogger("airflow.task")
 
@@ -576,6 +577,19 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
             self.pid = ti.pid
         else:
             self.state = None
+
+        tag_qry = session.query(TaskTag).filter(
+            TaskTag.dag_id == self.dag_id,
+            TaskTag.task_id == self.task_id
+        )
+
+        if lock_for_update:
+            tags = tag_qry.with_for_update().all()
+        else:
+            tags = tag_qry.all()
+
+        if tags:
+            self.tags = [tag.name for tag in tags]
 
         self.log.debug("Refreshed TaskInstance %s", self)
 
