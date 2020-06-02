@@ -97,9 +97,8 @@ class TaskTag(Base):
     Model for task tags, connected to task instances by dag_id and task_id
     """
     __tablename__ = 'task_tag'
+    tag_id = Column('tag_id', Integer, primary_key=True)
     name = Column('name', String(length=100), primary_key=True)
-    dag_id = Column('dag_id', String(length=ID_LEN), ForeignKey('task_instance.dag_id'), primary_key=True)
-    task_id = Column('task_id', String(length=ID_LEN), ForeignKey('task_instance.task_id'), primary_key=True)
 
 
 def clear_task_instances(tis,
@@ -232,8 +231,8 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
     queued_by_job_id = Column(Integer)
     pid = Column(Integer)
     executor_config = Column(PickleType(pickler=dill))
-    tags = relationship('TaskTag', primaryjoin=and_(TaskTag.dag_id == dag_id, TaskTag.task_id == task_id),
-                        cascade='all,delete-orphan', backref=backref('task_instance'))
+    tag_id = Column(Integer, ForeignKey('task_tag.tag_id'))
+    tags = relationship('TaskTag', cascade='all,delete-orphan', backref=backref('task_instance'))
 
     external_executor_id = Column(String(ID_LEN, **COLLATION_ARGS))
     # If adding new fields here then remember to add them to
@@ -565,13 +564,11 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
             self.operator = ti.operator
             self.queued_dttm = ti.queued_dttm
             self.pid = ti.pid
+            self.tag_id = ti.tag_id
         else:
             self.state = None
 
-        tag_qry = session.query(TaskTag).filter(
-            TaskTag.dag_id == self.dag_id,
-            TaskTag.task_id == self.task_id
-        )
+        tag_qry = session.query(TaskTag).filter(TaskTag.tag_id == self.tag_id)
 
         if lock_for_update:
             tags = tag_qry.with_for_update().all()
@@ -601,6 +598,9 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
         self.executor_config = task.executor_config
         self.operator = task.task_type
         self.tags = task.tags
+
+        for tag in task.tags:
+            self.tags.append(TaskTag(name=tag))
 
     @provide_session
     def clear_xcom_data(self, session=None):
