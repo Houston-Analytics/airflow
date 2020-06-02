@@ -272,13 +272,8 @@ class BaseOperator(Operator, LoggingMixin, TaskMixin, metaclass=BaseOperatorMeta
     :param do_xcom_push: if True, an XCom is pushed containing the Operator's
         result
     :type do_xcom_push: bool
-<<<<<<< HEAD
     :param task_tags: List of tags used to identify this task
     :type task_tags: list
-=======
-    :param tags: List of tags used to identify this task
-    :type tags: list
->>>>>>> Add TaskTag relationship to TaskInstance and display tags in task instance tooltips
     """
     # For derived classes to define which fields will get jinjaified
     template_fields: Iterable[str] = ()
@@ -1103,15 +1098,16 @@ class BaseOperator(Operator, LoggingMixin, TaskMixin, metaclass=BaseOperatorMeta
             .filter(TaskTag.dag_id == self.dag_id)\
             .filter(TaskTag.task_id == self.task_id)\
             .all()
+        db_tag_names = [tag.name for tag in db_tags]
 
         # Add missing tags
         for name in tags_set:
-            if name not in db_tags:
+            if name not in db_tag_names:
                 tag = TaskTag(name=name, dag_id=self.dag_id, task_id=self.task_id)
                 session.add(tag)
 
         # Remove old tags
-        for name in db_tags:
+        for name in db_tag_names:
             if name not in tags_set:
                 session.query(TaskTag)\
                     .filter(TaskTag.name == name)\
