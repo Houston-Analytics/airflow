@@ -232,7 +232,7 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
     pid = Column(Integer)
     executor_config = Column(PickleType(pickler=dill))
     tag_id = Column(Integer, ForeignKey('task_tag.tag_id'))
-    tags = relationship('TaskTag', cascade='all,delete-orphan', backref=backref('task_instance'))
+    tags = relationship('TaskTag', backref=backref('task_instance'))
 
     external_executor_id = Column(String(ID_LEN, **COLLATION_ARGS))
     # If adding new fields here then remember to add them to
