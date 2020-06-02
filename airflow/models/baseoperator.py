@@ -370,7 +370,7 @@ class BaseOperator(Operator, LoggingMixin, TaskMixin, metaclass=BaseOperatorMeta
         inlets: Optional[Any] = None,
         outlets: Optional[Any] = None,
         task_group: Optional["TaskGroup"] = None,
-        tags: Optional[str] = None,
+        tags: Optional[List[str]] = None,
         **kwargs
     ):
         from airflow.models.dag import DagContext
@@ -1081,15 +1081,16 @@ class BaseOperator(Operator, LoggingMixin, TaskMixin, metaclass=BaseOperatorMeta
             .filter(TaskTag.dag_id == self.dag_id)\
             .filter(TaskTag.task_id == self.task_id)\
             .all()
+        db_tag_names = [tag.name for tag in db_tags]
 
         # Add missing tags
         for name in tags_set:
-            if name not in db_tags:
+            if name not in db_tag_names:
                 tag = TaskTag(name=name, dag_id=self.dag_id, task_id=self.task_id)
                 session.add(tag)
 
         # Remove old tags
-        for name in db_tags:
+        for name in db_tag_names:
             if name not in tags_set:
                 session.query(TaskTag)\
                     .filter(TaskTag.name == name)\
