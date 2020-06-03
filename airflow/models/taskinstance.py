@@ -98,8 +98,9 @@ class TaskTag(Base):
     Model for task tags, connected to task instances by dag_id and task_id
     """
     __tablename__ = 'task_tag'
-    tag_id = Column('tag_id', Integer, ForeignKey('task_instance.tag_id'), primary_key=True)
-    name = Column('name', String(length=100))
+    name = Column('name', String(length=100), primary_key=True)
+    dag_id = Column('dag_id', String(length=ID_LEN), ForeignKey('task_instance.dag_id'), primary_key=True)
+    task_id = Column('task_id', String(length=ID_LEN), ForeignKey('task_instance.task_id'), primary_key=True)
 
 
 def clear_task_instances(tis,
@@ -563,11 +564,13 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
             self.operator = ti.operator
             self.queued_dttm = ti.queued_dttm
             self.pid = ti.pid
-            self.tag_id = ti.tag_id
         else:
             self.state = None
 
-        tag_qry = session.query(TaskTag).filter(TaskTag.tag_id == self.tag_id)
+        tag_qry = session.query(TaskTag).filter(
+            TaskTag.dag_id == self.dag_id,
+            TaskTag.task_id == self.task_id
+        )
 
         if lock_for_update:
             tags = tag_qry.with_for_update().all()
