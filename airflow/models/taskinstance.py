@@ -97,7 +97,7 @@ class TaskTag(Base):
     Model for task tags, connected to task instances by dag_id and task_id
     """
     __tablename__ = 'task_tag'
-    tag_id = Column('tag_id', Integer, primary_key=True)
+    tag_id = Column('tag_id', Integer, ForeignKey('task_instance.tag_id'), primary_key=True)
     name = Column('name', String(length=100))
 
 
@@ -231,7 +231,7 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
     queued_by_job_id = Column(Integer)
     pid = Column(Integer)
     executor_config = Column(PickleType(pickler=dill))
-    tag_id = Column(Integer, ForeignKey('task_tag.tag_id'))
+    tag_id = Column(Integer)
     tags = relationship('TaskTag', backref=backref('task_instance'))
 
     external_executor_id = Column(String(ID_LEN, **COLLATION_ARGS))
@@ -600,7 +600,7 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
         self.tags = task.tags
 
         for tag in task.tags:
-            self.tags.append(TaskTag(name=tag))
+            self.tags.append(TaskTag(tag_id=self.tag_id, name=tag))
 
     @provide_session
     def clear_xcom_data(self, session=None):
