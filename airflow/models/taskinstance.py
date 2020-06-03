@@ -232,7 +232,7 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
     queued_dttm = Column(UtcDateTime)
     queued_by_job_id = Column(Integer)
     pid = Column(Integer)
-    executor_config = Column(PickleType(pickler=dill))
+    executor_config = Column(PickleType(pickler=dill)
     task_tags = relationship('TaskTag', backref=backref('task_instance'), passive_deletes=True, lazy='raise')
     external_executor_id = Column(String(ID_LEN, **COLLATION_ARGS))
     # If adding new fields here then remember to add them to
