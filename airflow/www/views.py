@@ -2919,6 +2919,29 @@ class TaskRescheduleModelView(AirflowModelView):
 
 class TaskInstanceModelView(AirflowModelView):
     """View to show records from TaskInstance table"""
+
+    class TagContainsFilter(BaseFilter):
+        name = lazy_gettext('Contains')
+        arg_name = 'tagct'
+
+        def apply(self, query, value):
+            return query.filter(
+                models.TaskInstance.tags.any(
+                    models.taskinstance.TaskTag.name.ilike('%' + value + '%')
+                )
+            )
+
+    class TagNotContainsFilter(BaseFilter):
+        name = lazy_gettext('Not Contains')
+        arg_name = 'tagnct'
+
+        def apply(self, query, value):
+            return query.filter(
+                ~models.TaskInstance.tags.any(
+                    models.taskinstance.TaskTag.name.ilike('%' + value + '%')
+                )
+            )
+
     route_base = '/taskinstance'
 
     datamodel = AirflowModelView.CustomSQLAInterface(models.TaskInstance)  # noqa # type: ignore
@@ -2941,10 +2964,14 @@ class TaskInstanceModelView(AirflowModelView):
 
     base_filters = [['dag_id', DagFilter, lambda: []]]
 
-    def log_url_formatter(self):
-        """Formats log URL."""
-        log_url = self.get('log_url')  # noqa pylint: disable=no-member
-        return Markup(  # noqa
+    column_filters = [
+        TagContainsFilter(column_name='tags', datamodel=models.TaskInstance),
+        TagNotContainsFilter(column_name='tags', datamodel=models.TaskInstance)
+    ]
+
+    def log_url_formatter(attr):
+        log_url = attr.get('log_url')
+        return Markup(
             '<a href="{log_url}">'
             '    <span class="glyphicon glyphicon-book" aria-hidden="true">'
             '</span></a>').format(log_url=log_url)
