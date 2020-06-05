@@ -488,6 +488,7 @@ class CustomSQLAInterface(SQLAInterface):
 
 
 class TaskTagModelConverter(GeneralModelConverter):
+
     def _convert_col(
         self,
         col_name,

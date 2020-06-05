@@ -2413,17 +2413,7 @@ class AirflowModelView(ModelView):  # noqa: D101
 
 
 class TaskTagModelView(AirflowModelView):
-    """
-    AirflowModelView that uses TaskTagModelConverter instead of default
-    GeneralModelView
-    """
-
     def _init_forms(self):
-        """
-        Currently it isn't possible to specify which converter to use when creating
-        default forms so we need to override this function and manually use
-        TaskTagModelConverter
-        """
         conv = wwwutils.TaskTagModelConverter(self.datamodel)
         if not self.search_form:
             self.search_form = conv.create_form(
@@ -2963,8 +2953,6 @@ class TaskInstanceModelView(TaskTagModelView):
     base_order = ('job_id', 'asc')
 
     base_filters = [['dag_id', DagFilter, lambda: []]]
-
-    search_form = wwwutils.TaskTagModelConverter.create_form(inc_columns=search_columns)
 
     def log_url_formatter(attr):
         log_url = attr.get('log_url')
