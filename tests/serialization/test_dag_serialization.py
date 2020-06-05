@@ -103,7 +103,8 @@ serialized_simple_dag_ground_truth = {
                                         '__type': 'k8s.V1Pod',
                                         '__var': PodGenerator.serialize_pod(executor_config_pod)}
                                     }
-                                    }
+                                    },
+                "tags": ["example", "bash"]
             },
             {
                 "task_id": "custom_task",
@@ -804,7 +805,8 @@ class TestStringifiedDAGs(unittest.TestCase):
                           'task_id': '10',
                           'trigger_rule': 'all_success',
                           'wait_for_downstream': False,
-                          'weight_rule': 'downstream'}, fields,
+                          'weight_rule': 'downstream',
+                          'tags': []}, fields,
                          """
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
