@@ -42,8 +42,11 @@ def upgrade():
         sa.Column('name', sa.String(length=100), nullable=False),
         sa.Column('dag_id', sa.String(length=250), nullable=False),
         sa.Column('task_id', sa.String(length=250), nullable=False),
-        sa.ForeignKeyConstraint(['dag_id', 'task_id'], ['task_instance.dag_id', 'task_instance.task_id']),
-        sa.PrimaryKeyConstraint('name', 'dag_id', 'task_id')
+        sa.Column('execution_date', UtcDateTime, nullable=False),
+        sa.ForeignKeyConstraint(('dag_id', 'task_id', 'execution_date'),
+                                ('task_instance.dag_id', 'task_instance.task_id', 'task_instance.execution_date'),
+                                ondelete='CASCADE'),
+        sa.PrimaryKeyConstraint('name', 'dag_id', 'task_id', 'execution_date')
     )
 
 
