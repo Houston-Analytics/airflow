@@ -404,8 +404,8 @@ class BaseOperator(Operator, LoggingMixin, TaskMixin, metaclass=BaseOperatorMeta
         self.email = email
         self.email_on_retry = email_on_retry
         self.email_on_failure = email_on_failure
-        self._tags = []
-        self.tags = tags
+        self._task_tags = []
+        self.task_tags = task_tags
 
         self.start_date = start_date
         if start_date and not isinstance(start_date, datetime):
@@ -632,19 +632,19 @@ class BaseOperator(Operator, LoggingMixin, TaskMixin, metaclass=BaseOperatorMeta
         self._dag = dag
 
     @property
-    def tags(self) -> List[str]:
+    def task_tags(self) -> List[str]:
         """
         Returns the list of tags for this task
         """
-        return self._tags or []
+        return self._task_tags or []
 
-    @tags.setter
-    def tags(self, tags: Optional[List[str]]):
+    @task_tags.setter
+    def task_tags(self, task_tags: Optional[List[str]]):
         """
         Sets the tags for this task, removing duplicates
-        If tags is None, tags will be an empty list
+        If task_tags is None, task_tags will be an empty list
         """
-        self._tags = list(set(tags or []))
+        self._task_tags = list(set(task_tags or []))
 
     def has_dag(self):
         """

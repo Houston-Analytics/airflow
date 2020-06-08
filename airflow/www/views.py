@@ -1651,7 +1651,7 @@ class Airflow(AirflowBaseView):  # noqa: D101  pylint: disable=too-many-public-m
                 task_instance.try_number,
                 None,  # start_ts
                 None,  # duration
-                [tag.name for tag in ti.tags]  # tags
+                [tag.name for tag in ti.task_tags]  # tags
             ]
 
             if task_instance.start_date:
@@ -1679,7 +1679,7 @@ class Airflow(AirflowBaseView):  # noqa: D101  pylint: disable=too-many-public-m
                 'retries': task.retries,
                 'owner': task.owner,
                 'ui_color': task.ui_color,
-                'tags': task.tags
+                'tags': task.task_tags
             }
 
             if task.downstream_list:

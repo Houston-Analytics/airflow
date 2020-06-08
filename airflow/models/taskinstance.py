@@ -242,9 +242,14 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
     queued_dttm = Column(UtcDateTime)
     queued_by_job_id = Column(Integer)
     pid = Column(Integer)
+<<<<<<< HEAD
     executor_config = Column(PickleType(pickler=dill)
     task_tags = relationship('TaskTag', backref=backref('task_instance'), passive_deletes=True, lazy='raise')
     external_executor_id = Column(String(ID_LEN, **COLLATION_ARGS))
+=======
+    executor_config = Column(PickleType(pickler=dill))
+    task_tags = relationship('TaskTag', backref=backref('task_instance'), lazy='joined')
+>>>>>>> Rename tags to task_tags since tags is already used in ECSOperator
     # If adding new fields here then remember to add them to
     # refresh_from_db() or they wont display in the UI correctly
 
@@ -545,7 +550,7 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
         """
         self.log.debug("Refreshing TaskInstance %s from DB", self)
 
-        qry = session.query(TaskInstance).options(joinedload(TaskInstance.tags)).filter(
+        qry = session.query(TaskInstance).options(joinedload(TaskInstance.task_tags)).filter(
             TaskInstance.dag_id == self.dag_id,
             TaskInstance.task_id == self.task_id,
             TaskInstance.execution_date == self.execution_date)
