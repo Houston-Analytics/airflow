@@ -90,7 +90,7 @@ serialized_simple_dag_ground_truth = {
                 "_downstream_task_ids": [],
                 "_inlets": [],
                 "_outlets": [],
-                "_task_tags": [],
+                "_tags": [],
                 "ui_color": "#f0ede4",
                 "ui_fgcolor": "#000",
                 "template_fields": ['bash_command', 'env'],
@@ -104,8 +104,7 @@ serialized_simple_dag_ground_truth = {
                                         '__type': 'k8s.V1Pod',
                                         '__var': PodGenerator.serialize_pod(executor_config_pod)}
                                     }
-                                    },
-                "tags": ["example", "bash"]
+                                    }
             },
             {
                 "task_id": "custom_task",
@@ -114,7 +113,7 @@ serialized_simple_dag_ground_truth = {
                 "_downstream_task_ids": [],
                 "_inlets": [],
                 "_outlets": [],
-                "_task_tags": [],
+                "_tags": [],
                 "_operator_extra_links": [{"tests.test_utils.mock_operators.CustomOpLink": {}}],
                 "ui_color": "#fff",
                 "ui_fgcolor": "#000",
