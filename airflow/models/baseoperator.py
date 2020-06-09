@@ -404,7 +404,7 @@ class BaseOperator(Operator, LoggingMixin, TaskMixin, metaclass=BaseOperatorMeta
         self.email = email
         self.email_on_retry = email_on_retry
         self.email_on_failure = email_on_failure
-        self._task_tags = []
+        self._task_tags: List[str] = []
         self.task_tags = task_tags
 
         self.start_date = start_date

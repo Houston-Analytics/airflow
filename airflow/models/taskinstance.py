@@ -35,8 +35,8 @@ import jinja2
 import lazy_object_proxy
 import pendulum
 from jinja2 import TemplateAssertionError, UndefinedError
-from sqlalchemy import Column, Float, ForeignKey, Index, Integer, PickleType, String, and_, func, or_
-from sqlalchemy.orm import backref, foreign, joinedload, reconstructor, relationship
+from sqlalchemy import Column, Float, Index, Integer, PickleType, String, and_, func, or_
+from sqlalchemy.orm import backref, joinedload, reconstructor, relationship
 from sqlalchemy.orm.session import Session
 from sqlalchemy.schema import ForeignKeyConstraint, PrimaryKeyConstraint
 from sqlalchemy.sql.elements import BooleanClauseList
@@ -103,7 +103,9 @@ class TaskTag(Base):
     __table_args__ = (
         PrimaryKeyConstraint('name', 'dag_id', 'task_id', 'execution_date'),
         ForeignKeyConstraint(('dag_id', 'task_id', 'execution_date'),
-                             ('task_instance.dag_id', 'task_instance.task_id', 'task_instance.execution_date'),
+                             ('task_instance.dag_id',
+                              'task_instance.task_id',
+                              'task_instance.execution_date'),
                              ondelete='CASCADE'),
     )
 
@@ -242,14 +244,9 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
     queued_dttm = Column(UtcDateTime)
     queued_by_job_id = Column(Integer)
     pid = Column(Integer)
-<<<<<<< HEAD
     executor_config = Column(PickleType(pickler=dill)
     task_tags = relationship('TaskTag', backref=backref('task_instance'), passive_deletes=True, lazy='raise')
     external_executor_id = Column(String(ID_LEN, **COLLATION_ARGS))
-=======
-    executor_config = Column(PickleType(pickler=dill))
-    task_tags = relationship('TaskTag', backref=backref('task_instance'), lazy='joined')
->>>>>>> Rename tags to task_tags since tags is already used in ECSOperator
     # If adding new fields here then remember to add them to
     # refresh_from_db() or they wont display in the UI correctly
 
