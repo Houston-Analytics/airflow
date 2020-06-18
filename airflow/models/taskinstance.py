@@ -102,9 +102,9 @@ class TaskTag(Base):
     __tablename__ = 'task_tag'
     __table_args__ = (
         PrimaryKeyConstraint('name', 'dag_id', 'task_id', 'execution_date'),
-        ForeignKeyConstraint(('dag_id', 'task_id', 'execution_date'),
-                             ('task_instance.dag_id',
-                              'task_instance.task_id',
+        ForeignKeyConstraint(('task_id', 'dag_id', 'execution_date'),
+                             ('task_instance.task_id',
+                              'task_instance.dag_id',
                               'task_instance.execution_date'),
                              ondelete='CASCADE'),
     )
@@ -612,8 +612,8 @@ class TaskInstance(Base, LoggingMixin):     # pylint: disable=R0902,R0904
         self.executor_config = task.executor_config
         self.operator = task.task_type
 
-        for tag in task.tags:
-            self.tags.append(TaskTag(tag_id=self.tag_id, name=tag))
+        for tag in self.task_tags:
+            self.task_tags.append(TaskTag(name=tag))
 
     @provide_session
     def clear_xcom_data(self, session=None):
