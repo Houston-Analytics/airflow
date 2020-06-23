@@ -489,6 +489,18 @@ class CustomSQLAInterface(SQLAInterface):
         else:
             return super().get_col_default(col_name)
 
+    def _get_base_query(
+        self, query=None, filters=None, order_column="", order_direction=""
+    ):
+        """
+        If a FAB view is querying a TaskInstance, do an explicit joinedload for
+        task_tags name column
+        """
+        query = super()._get_base_query(query, filters, order_column, order_direction)
+        if query.column_descriptions[0]['name'] == 'TaskInstance':
+            query = query.options(joinedload('task_tags').load_only('name'))
+        return query
+
     filter_converter_class = UtcAwareFilterConverter
 
 
