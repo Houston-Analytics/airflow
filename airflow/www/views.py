@@ -1627,7 +1627,7 @@ class Airflow(AirflowBaseView):  # noqa: D101  pylint: disable=too-many-public-m
         max_date = max(dates) if dates else None
         min_date = min(dates) if dates else None
 
-        tis = dag.get_task_instances(start_date=min_date, end_date=base_date)
+        tis = dag.get_task_instances(start_date=min_date, end_date=base_date, load_task_tags=True)
         task_instances: Dict[Tuple[str, datetime], models.TaskInstance] = {}
         for ti in tis:
             task_instances[(ti.task_id, ti.execution_date)] = ti
@@ -1788,7 +1788,7 @@ class Airflow(AirflowBaseView):  # noqa: D101  pylint: disable=too-many-public-m
         form.execution_date.choices = dt_nr_dr_data['dr_choices']
 
         task_instances = {}
-        for ti in dag.get_task_instances(dttm, dttm):
+        for ti in dag.get_task_instances(dttm, dttm, load_task_tags=True):
             task_instances[ti.task_id] = alchemy_to_dict(ti)
             task_instances[ti.task_id]['tags'] = [tag.name for tag in ti.task_tags]
         tasks = {
@@ -2980,7 +2980,7 @@ class TaskInstanceModelView(TaskTagModelView):
         if tags:
             return ', '.join(tags_str)
         else:
-            return ''
+            return ' '
 
     formatters_columns = {
         'log_url': log_url_formatter,
