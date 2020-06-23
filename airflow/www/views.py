@@ -2413,6 +2413,11 @@ class AirflowModelView(ModelView):  # noqa: D101
 
 
 class TaskTagModelView(AirflowModelView):
+    """
+    AirflowModelView that uses TaskTagModelConverter instead of default
+    GeneralModelView
+    """
+
     def _init_forms(self):
         """
         Currently it isn't possible to specify which converter to use when creating
