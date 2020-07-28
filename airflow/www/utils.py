@@ -158,9 +158,9 @@ def generate_pages(current_page,
         vals = {
             'is_active': 'active' if is_current(current_page, page) else '',
             'href_link': void_link if is_current(current_page, page)
-                         else '?{}'.format(get_params(page=page,
-                                                      search=search,
-                                                      status=status)),
+            else '?{}'.format(get_params(page=page,
+                                         search=search,
+                                         status=status)),
             'page_num': page + 1
         }
         output.append(page_node.format(**vals))  # noqa
@@ -252,9 +252,11 @@ def state_f(attr):
 
 def nobr_f(attr_name):
     """Returns a formatted string with HTML with a Non-breaking Text element"""
+
     def nobr(attr):
         f = attr.get(attr_name)
         return Markup("<nobr>{}</nobr>").format(f)  # noqa
+
     return nobr
 
 
@@ -461,6 +463,7 @@ class CustomSQLAInterface(SQLAInterface):
     '_' from the key to lookup the column names.
 
     """
+
     def __init__(self, obj, session=None):
         super().__init__(obj, session=session)
 
@@ -481,8 +484,8 @@ class CustomSQLAInterface(SQLAInterface):
         if col_name in self.list_columns:
             obj = self.list_columns[col_name].type
             return isinstance(obj, UtcDateTime) or \
-                isinstance(obj, sqla.types.TypeDecorator) and \
-                isinstance(obj.impl, UtcDateTime)
+                   isinstance(obj, sqla.types.TypeDecorator) and \
+                   isinstance(obj.impl, UtcDateTime)
         return False
 
     def is_tasktag(self, col_name):
@@ -497,17 +500,23 @@ class CustomSQLAInterface(SQLAInterface):
         else:
             return super().get_col_default(col_name)
 
-    def _get_base_query(
-        self, query=None, filters=None, order_column="", order_direction=""
+    def apply_all(
+        self,
+        query,
+        filters=None,
+        order_column="",
+        order_direction="",
+        page=None,
+        page_size=None,
+        select_columns=None,
     ):
         """
         If a FAB view is querying a TaskInstance, do an explicit joinedload for
         task_tags name column
         """
-        query = super()._get_base_query(query, filters, order_column, order_direction)
         if query.column_descriptions[0]['name'] == 'TaskInstance':
             query = query.options(joinedload('task_tags').load_only('name'))
-        return query
+        return super().apply_all(query, filters, order_column, order_direction, page, page_size, select_columns)
 
     filter_converter_class = UtcAwareFilterConverter
 
